@@ -1,5 +1,6 @@
 import pytest
 
+from models import db
 from mapp import create_app
 
 
@@ -11,5 +12,4 @@ def app():
 
 @pytest.fixture
 def _db(app):
-    from mapp import db
     return db

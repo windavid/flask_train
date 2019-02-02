@@ -1,6 +1,8 @@
 from flask import Flask
-from models import db
+import pathlib
+import json
 
+from models import db
 
 
 def create_app():
@@ -21,6 +23,25 @@ def create_app():
     return app
 
 
-if __name__ == "__main__":
+def import_json(table_name, json_name):
+    table = db.metadata.tables[table_name]
+    json_path = pathlib.Path(json_name)
+    with json_path.open(mode='r') as f:
+        json_data = json.load(f)
+    for j in json_data:
+        inst = table.from_json(j)
+        db.session.add(inst)
+    db.session.commit()
+
+
+def embed():
     app = create_app()
-    app.run()
+    with app.app_context():
+        from IPython import embed
+        embed()
+
+
+if __name__ == "__main__":
+    embed()
+    # app = create_app()
+    # app.run()
