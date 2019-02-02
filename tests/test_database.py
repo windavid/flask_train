@@ -157,3 +157,6 @@ def test_patient_filter(_db):
     q2 = Patient.query.filter(Patient.payments_sum < 5).all()
     assert len(q2) == 1
     assert q2[0].first_name == "Roy"
+
+
+# test load and update from json

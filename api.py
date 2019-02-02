@@ -29,6 +29,7 @@ def db_test():
 @use_args({'payment_min': fields.Int(missing=None),
            'payments_max': fields.Int(missing=None)}, locations=("query",))
 def patients(args):
+    # TODO: unit test
     query = Patient.query
     if args.get("payment_min"):
         query = query.filter(Patient.payments_sum >= args["payment_min"])
@@ -40,6 +41,7 @@ def patients(args):
 @api.route('/payments')
 @use_args({'external_id': fields.Str(missing=None)}, locations=("query",))
 def payments(args):
+    # TODO: unit test
     query = Payment.query
     if args.get("external_id"):
         query = query.filter(Payment.external_id == args["external_id"])
