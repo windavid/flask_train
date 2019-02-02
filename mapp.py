@@ -5,7 +5,7 @@ import json
 from models import db
 
 
-def create_app():
+def create_app(drop_table=False):
     # TODO: configure app
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'aspdfiojapfiha'

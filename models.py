@@ -36,7 +36,7 @@ class Patient(db.Model, BaseMixin):
     last_name = sa.Column(sa.String, nullable=False)
     middle_name = sa.Column(sa.String)
     date_of_birth = sa.Column(sa.Date)
-    external_id = sa.Column(sa.String)  # shouldn't it be unique?
+    external_id = sa.Column(sa.String, unique=True)  # shouldn't it be unique?
 
     # TODO: find a plugin to do it
     _from_json_translate = {'externalId': 'external_id', "firstName": "first_name", "lastName": "last_name",
@@ -63,7 +63,7 @@ class Payment(db.Model, BaseMixin):
 
     amount = sa.Column(sa.Float, nullable=False)
     patient_id = sa.Column(sa.Integer, sa.ForeignKey('patients.id'), nullable=False)
-    external_id = sa.Column(sa.String)
+    external_id = sa.Column(sa.String, unique=True)
 
     _from_json_translate = {'patientId': 'patient_id', 'externalId': 'external_id'}
     _json_schema = schemas.payment

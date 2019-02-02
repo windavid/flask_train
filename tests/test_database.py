@@ -1,7 +1,8 @@
 import datetime
+import copy
 from jsonschema import validate
 import pytest
-
+import sqlalchemy.exc
 import schemas
 from models import Patient, Payment
 
@@ -84,3 +85,29 @@ def test_payments(_db):
         "patientId": "5",
         "externalId": "501"
     }
+
+
+def test_unique_external(_db):
+    pay_json = {
+        "amount": 4.46,
+        "patientId": "5",
+        "externalId": "501"
+    }
+    for _ in range(2):
+        _db.session.add(Payment.from_json(copy.copy(pay_json)))
+    with pytest.raises(sqlalchemy.exc.IntegrityError) as excinfo:
+        _db.session.commit()
+        assert 'UNIQUE constraint failed: payments.external_id' in excinfo.value.message
+    _db.session.rollback()
+
+    pat_json = {
+        "firstName": "Rick",
+        "lastName": "Deckard",
+        "dateOfBirth": "2094-02-01",
+        "externalId": "5"
+    }
+    for _ in range(2):
+        _db.session.add(Patient.from_json(copy.copy(pat_json)))
+    with pytest.raises(sqlalchemy.exc.IntegrityError) as excinfo:
+        _db.session.commit()
+        assert 'UNIQUE constraint failed: patients.external_id' in excinfo.value.message
