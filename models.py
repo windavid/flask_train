@@ -82,3 +82,6 @@ class Payment(db.Model, BaseMixin):
         d['patientId'] = str(d['patientId'])
         d['amount'] = self.amount
         return d
+
+
+models = {'patients': Patient, 'payments': Payment}

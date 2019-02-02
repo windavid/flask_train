@@ -24,24 +24,19 @@ def create_app():
 
 
 def import_json(table_name, json_name):
-    table = db.metadata.tables[table_name]
+    from models import models
+
+    model = models[table_name]
+    print(f"import '{json_name}' to '{table_name}' table")
+    before_entries = model.query.count()
+    print(f"before import table contains {before_entries} entries")
     json_path = pathlib.Path(json_name)
     with json_path.open(mode='r') as f:
         json_data = json.load(f)
+    print(f"importing {len(json_data)} entries")
     for j in json_data:
-        inst = table.from_json(j)
+        inst = model.from_json(j)
         db.session.add(inst)
     db.session.commit()
-
-
-def embed():
-    app = create_app()
-    with app.app_context():
-        from IPython import embed
-        embed()
-
-
-if __name__ == "__main__":
-    embed()
-    # app = create_app()
-    # app.run()
+    after_entries = model.query.count()
+    print(f"after import table contains {after_entries} entries")
