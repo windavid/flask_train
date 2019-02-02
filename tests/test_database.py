@@ -33,7 +33,8 @@ def test_schemas():
     # TODO: assert raises checks (incorrect jsons)
 
 
-def test_json_translations(_db):
+def test_patients(_db):
+    # json, create & update time
     now = datetime.datetime.utcnow()
     pat = Patient.from_json({
         "firstName": "Rick",
@@ -50,5 +51,36 @@ def test_json_translations(_db):
     mod_time = datetime.datetime.utcnow()
     pat.first_name += " Junior"
     _db.session.commit()
+    assert pat.updated >= mod_time
+    assert pat.to_json() == {
+        "firstName": "Rick Junior",
+        "lastName": "Deckard",
+        "dateOfBirth": "2094-02-01",
+        "externalId": "5"
+    }
 
-    assert pat.updated > mod_time
+
+def test_payments(_db):
+    now = datetime.datetime.utcnow()
+    pay = Payment.from_json({
+        "amount": 4.46,
+        "patientId": "5",
+        "externalId": "501"
+    })
+    assert pay.id is None
+    _db.session.add(pay)
+    _db.session.commit()
+    assert pay.id > 0
+    assert pay.created >= now
+    assert pay.created == pay.updated
+
+    mod_time = datetime.datetime.utcnow()
+    pay.amount += 1.0
+    _db.session.commit()
+    assert pay.updated >= mod_time
+
+    assert pay.to_json() == {
+        "amount": 5.46,
+        "patientId": "5",
+        "externalId": "501"
+    }

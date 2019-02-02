@@ -52,6 +52,11 @@ class Patient(db.Model, BaseMixin):
         jdict['date_of_birth'] = datetime.datetime.strptime(jdict['date_of_birth'], "%Y-%m-%d").date()
         return cls(**jdict)
 
+    def to_json(self):
+        d = super().to_json()
+        d['dateOfBirth'] = datetime.datetime.strftime(d['dateOfBirth'], "%Y-%m-%d")
+        return d
+
 
 class Payment(db.Model, BaseMixin):
     __tablename__ = 'payments'
@@ -59,3 +64,21 @@ class Payment(db.Model, BaseMixin):
     amount = sa.Column(sa.Float, nullable=False)
     patient_id = sa.Column(sa.Integer, sa.ForeignKey('patients.id'), nullable=False)
     external_id = sa.Column(sa.String)
+
+    _from_json_translate = {'patientId': 'patient_id', 'externalId': 'external_id'}
+    _json_schema = schemas.payment
+
+    @classmethod
+    def from_json(cls, jdict):
+        if cls._json_schema:
+            validate(jdict, cls._json_schema)
+        for key1, key2 in cls._from_json_translate.items():
+            jdict[key2] = jdict.pop(key1)
+        jdict['patient_id'] = int(jdict['patient_id'])
+        return cls(**jdict)
+
+    def to_json(self):
+        d = super().to_json()
+        d['patientId'] = str(d['patientId'])
+        d['amount'] = self.amount
+        return d
