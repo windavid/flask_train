@@ -5,11 +5,11 @@ import json
 from models import db
 
 
-def create_app(drop_table=False):
-    # TODO: configure app
+def create_app(dbname, drop_table=False):
+    # TODO: pass configuration instead of dbname and drop_table
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'aspdfiojapfiha'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{dbname}'
 
     db.init_app(app)
     with app.app_context():

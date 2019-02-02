@@ -1,8 +1,10 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from jsonschema import validate
 import schemas
+from sqlalchemy_utils import aggregated
 
 
 db = SQLAlchemy()
@@ -37,6 +39,11 @@ class Patient(db.Model, BaseMixin):
     middle_name = sa.Column(sa.String)
     date_of_birth = sa.Column(sa.Date)
     external_id = sa.Column(sa.String, unique=True)  # shouldn't it be unique?
+
+    @aggregated('payments', sa.Column(sa.Float, default=0))
+    def payments_sum(self):
+        return sa.func.sum(Payment.amount)
+    payments = sa.orm.relationship('Payment')
 
     # TODO: find a plugin to do it
     _from_json_translate = {'externalId': 'external_id', "firstName": "first_name", "lastName": "last_name",

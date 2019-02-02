@@ -111,3 +111,49 @@ def test_unique_external(_db):
     with pytest.raises(sqlalchemy.exc.IntegrityError) as excinfo:
         _db.session.commit()
         assert 'UNIQUE constraint failed: patients.external_id' in excinfo.value.message
+
+
+def test_patient_filter(_db):
+    patients = [{
+        "firstName": "Rick",
+        "lastName": "Deckard",
+        "dateOfBirth": "2094-02-01",
+        "externalId": "5"
+    }, {
+        "firstName": "Pris",
+        "lastName": "Stratton",
+        "dateOfBirth": "2093-12-20",
+        "externalId": "4"
+    }, {
+        "firstName": "Roy",
+        "lastName": "Batti",
+        "dateOfBirth": "2093-06-12",
+        "externalId": "8"
+    }]
+    payments = [{
+        "amount": 10,
+        "patientId": "1",
+        "externalId": "501"
+    }, {
+        "amount": 10,
+        "patientId": "1",
+        "externalId": "502"
+    }, {
+        "amount": 10,
+        "patientId": "2",
+        "externalId": "503"
+    }]
+    for p in patients:
+        _db.session.add(Patient.from_json(p))
+    for p in payments:
+        _db.session.add(Payment.from_json(p))
+    _db.session.commit()
+    q0 = Patient.query.filter(Patient.payments_sum > 15).all()
+    assert len(q0) == 1
+    assert q0[0].first_name == "Rick"
+    q1 = Patient.query.filter(Patient.payments_sum < 15).filter(Patient.payments_sum > 5).all()
+    assert len(q1) == 1
+    assert q1[0].first_name == "Pris"
+    q2 = Patient.query.filter(Patient.payments_sum < 5).all()
+    assert len(q2) == 1
+    assert q2[0].first_name == "Roy"
