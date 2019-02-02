@@ -1,4 +1,11 @@
-# Collectly quick python backend challenge 
+# Usage
+
+python 3 required (3.6)
+
+functionality: 1, 2 option 2, 3
+
+$ pytest # launch all tests
+$ python manage.py -h # view more usage description
 
 # Challenge description
 
