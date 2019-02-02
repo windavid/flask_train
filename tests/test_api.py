@@ -10,3 +10,8 @@ def test_blueprint_setup(client):
 def test_database(client, _db):
     r = client.get(url_for('api.db_test'))
     assert b'True' in r.data
+
+
+# test for payments
+
+# test for patients
